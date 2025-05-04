@@ -31,7 +31,7 @@ dependencies = [
     "youtube-transcript-api>=1.0.3",
 ]
 
-scripts.mcp-youtube-transcript = "mcp_youtube_transcript:main"
+scripts.mcp-youtube-transcript = "mcp_youtube_transcript.cli:main"
 
 [dependency-groups]
 dev = [
