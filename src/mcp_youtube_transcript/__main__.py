@@ -5,7 +5,6 @@
 #  This software is released under the MIT License.
 #
 #  http://opensource.org/licenses/mit-license.php
-
-from . import main
+from mcp_youtube_transcript.cli import main
 
 main()
