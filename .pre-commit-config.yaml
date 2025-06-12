@@ -27,8 +27,8 @@ repos:
       - id: mypy
         args: []
         additional_dependencies:
-          - "mcp>=1.4"
-          - "youtube-transcript-api>=1.0.3"
+          - "mcp>=1.9"
+          - "youtube-transcript-api>=1.1.0"
           - "beautifulsoup4>=4.13.3"
           - "rich-click>=1.8.8"
           - "pytest>=8.3.5"
