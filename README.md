@@ -49,12 +49,23 @@ After editing, restart the application.
 For more information,
 see: [For Claude Desktop Users - Model Context Protocol](https://modelcontextprotocol.io/quickstart/user).
 
-#### Installing via Smithery
-To install Youtube Transcript for Claude Desktop automatically via [Smithery](https://smithery.ai/server/@jkawamoto/mcp-youtube-transcript):
+### Installing via Smithery
+The [Smithery CLI](https://github.com/smithery-ai/cli) enables the installation of MCP servers on various clients.
+
+For instance, to install this server for Claude Desktop, execute the following command:
 
 ```bash
 npx -y @smithery/cli install @jkawamoto/mcp-youtube-transcript --client claude
 ```
+
+To view the list of clients supported by the Smithery CLI, use this command:
+
+```bash
+npx -y @smithery/cli list clients
+```
+
+Refer to the [Smithery CLI documentation](https://github.com/smithery-ai/cli) for additional details.
+
 
 ## Using Proxy Servers
 In environments where access to YouTube is restricted, you can use proxy servers.
