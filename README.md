@@ -4,6 +4,7 @@
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 [![smithery badge](https://smithery.ai/badge/@jkawamoto/mcp-youtube-transcript)](https://smithery.ai/server/@jkawamoto/mcp-youtube-transcript)
+[![Dockerhub](https://img.shields.io/badge/Docker-mcp%2Fyoutube--transcript-blue.svg)](https://hub.docker.com/mcp/server/youtube_transcript)
 
 This MCP server retrieves transcripts for given YouTube video URLs.
 
@@ -20,33 +21,12 @@ Fetches the transcript of a specified YouTube video.
 - **lang** *(string, optional)*: The desired language for the transcript. Defaults to `en` if not specified.
 
 ## Installation
+> [!NOTE]
+> You'll need [`uv`](https://docs.astral.sh/uv) installed on your system to use `uvx` command.
 
-### For Goose CLI
-To enable the YouTube Transcript extension in Goose CLI,
-edit the configuration file `~/.config/goose/config.yaml` to include the following entry:
-
-```yaml
-extensions:
-  youtube-transcript:
-    name: Youtube Transcript
-    cmd: uvx
-    args: [--from, git+https://github.com/jkawamoto/mcp-youtube-transcript, mcp-youtube-transcript]
-    enabled: true
-    type: stdio
-```
-
-### For Goose Desktop
-Add a new extension with the following settings:
-
-- **Type**: Standard IO
-- **ID**: youtube-transcript
-- **Name**: Youtube Transcript
-- **Description**: Retrieve transcripts of YouTube videos
-- **Command**: `uvx --from git+https://github.com/jkawamoto/mcp-youtube-transcript mcp-youtube-transcript`
-
-For more details on configuring MCP servers in Goose Desktop,
-refer to the documentation:
-[Using Extensions - MCP Servers](https://block.github.io/goose/docs/getting-started/using-extensions#mcp-servers).
+### For codename goose
+Please refer to this tutorial for detailed installation instructions:
+[YouTube Transcript Extension](https://block.github.io/goose/docs/mcp/youtube-transcript-mcp).
 
 ### For Claude Desktop
 To configure this server for Claude Desktop, edit the `claude_desktop_config.json` file with the following entry under
@@ -70,12 +50,23 @@ After editing, restart the application.
 For more information,
 see: [For Claude Desktop Users - Model Context Protocol](https://modelcontextprotocol.io/quickstart/user).
 
-#### Installing via Smithery
-To install Youtube Transcript for Claude Desktop automatically via [Smithery](https://smithery.ai/server/@jkawamoto/mcp-youtube-transcript):
+### Installing via Smithery
+The [Smithery CLI](https://github.com/smithery-ai/cli) enables the installation of MCP servers on various clients.
+
+For instance, to install this server for Claude Desktop, execute the following command:
 
 ```bash
 npx -y @smithery/cli install @jkawamoto/mcp-youtube-transcript --client claude
 ```
+
+To view the list of clients supported by the Smithery CLI, use this command:
+
+```bash
+npx -y @smithery/cli list clients
+```
+
+Refer to the [Smithery CLI documentation](https://github.com/smithery-ai/cli) for additional details.
+
 
 ## Using Proxy Servers
 In environments where access to YouTube is restricted, you can use proxy servers.
