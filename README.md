@@ -20,6 +20,8 @@ Fetches the transcript of a specified YouTube video.
 - **lang** *(string, optional)*: The desired language for the transcript. Defaults to `en` if not specified.
 
 ## Installation
+> [!NOTE]
+> You'll need [`uv`](https://docs.astral.sh/uv) installed on your system to use `uvx` command.
 
 ### For codename goose
 Please refer to this tutorial for detailed installation instructions:
