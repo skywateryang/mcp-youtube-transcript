@@ -8,7 +8,7 @@
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from functools import lru_cache, partial
-from typing import AsyncIterator
+from typing import AsyncIterator, Tuple
 from typing import Final
 from urllib.parse import urlparse, parse_qs
 
@@ -16,7 +16,7 @@ import requests
 from bs4 import BeautifulSoup
 from mcp.server import FastMCP
 from mcp.server.fastmcp import Context
-from pydantic import Field
+from pydantic import Field, BaseModel
 from youtube_transcript_api import YouTubeTranscriptApi
 from youtube_transcript_api.proxies import WebshareProxyConfig, GenericProxyConfig, ProxyConfig
 
@@ -35,7 +35,7 @@ async def _app_lifespan(_server: FastMCP, proxy_config: ProxyConfig | None) -> A
 
 
 @lru_cache
-def _get_transcript(ctx: AppContext, video_id: str, lang: str) -> str:
+def _get_transcript(ctx: AppContext, video_id: str, lang: str) -> Tuple[str, str]:
     if lang == "en":
         languages = ["en"]
     else:
@@ -46,11 +46,17 @@ def _get_transcript(ctx: AppContext, video_id: str, lang: str) -> str:
     )
     page.raise_for_status()
     soup = BeautifulSoup(page.text, "html.parser")
-    title = soup.title.string if soup.title else "Transcript"
+    title = soup.title.string if soup.title and soup.title.string else "Transcript"
 
     transcripts = ctx.ytt_api.fetch(video_id, languages=languages)
+    return title, "\n".join((item.text for item in transcripts))
 
-    return f"# {title}\n" + "\n".join((item.text for item in transcripts))
+
+class Transcript(BaseModel):
+    """Transcript of a YouTube video."""
+
+    title: str = Field(description="Title of the video")
+    transcript: str = Field(description="Transcript of the video")
 
 
 def server(
@@ -74,7 +80,7 @@ def server(
         ctx: Context,
         url: str = Field(description="The URL of the YouTube video"),
         lang: str = Field(description="The preferred language for the transcript", default="en"),
-    ) -> str:
+    ) -> Transcript:
         """Retrieves the transcript of a YouTube video."""
         parsed_url = urlparse(url)
         if parsed_url.hostname == "youtu.be":
@@ -86,9 +92,10 @@ def server(
             video_id = q[0]
 
         app_ctx: AppContext = ctx.request_context.lifespan_context  # type: ignore
-        return _get_transcript(app_ctx, video_id, lang)
+        title, transcript = _get_transcript(app_ctx, video_id, lang)
+        return Transcript(title=title, transcript=transcript)
 
     return mcp
 
 
-__all__: Final = ["server"]
+__all__: Final = ["server", "Transcript"]
