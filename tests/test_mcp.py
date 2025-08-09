@@ -15,6 +15,8 @@ from mcp import StdioServerParameters, stdio_client, ClientSession
 from mcp.types import TextContent
 from youtube_transcript_api import YouTubeTranscriptApi
 
+from mcp_youtube_transcript import Transcript
+
 params = StdioServerParameters(command="uv", args=["run", "mcp-youtube-transcript"])
 
 
@@ -44,14 +46,18 @@ async def test_get_transcript(mcp_client_session: ClientSession) -> None:
     video_id = "LPZh9BOjkQs"
 
     title = fetch_title(video_id, "en")
-    expect = f"# {title}\n" + "\n".join((item.text for item in YouTubeTranscriptApi().fetch(video_id)))
+    expect = Transcript(
+        title=title, transcript="\n".join((item.text for item in YouTubeTranscriptApi().fetch(video_id)))
+    )
 
     res = await mcp_client_session.call_tool(
         "get_transcript",
         arguments={"url": f"https//www.youtube.com/watch?v={video_id}"},
     )
     assert isinstance(res.content[0], TextContent)
-    assert res.content[0].text == expect
+
+    transcript = Transcript.model_validate_json(res.content[0].text)
+    assert transcript == expect
     assert not res.isError
 
 
@@ -61,14 +67,18 @@ async def test_get_transcript_with_language(mcp_client_session: ClientSession) -
     video_id = "WjAXZkQSE2U"
 
     title = fetch_title(video_id, "ja")
-    expect = f"# {title}\n" + "\n".join((item.text for item in YouTubeTranscriptApi().fetch(video_id, ["ja"])))
+    expect = Transcript(
+        title=title, transcript="\n".join((item.text for item in YouTubeTranscriptApi().fetch(video_id, ["ja"])))
+    )
 
     res = await mcp_client_session.call_tool(
         "get_transcript",
         arguments={"url": f"https//www.youtube.com/watch?v={video_id}", "lang": "ja"},
     )
     assert isinstance(res.content[0], TextContent)
-    assert res.content[0].text == expect
+
+    transcript = Transcript.model_validate_json(res.content[0].text)
+    assert transcript == expect
     assert not res.isError
 
 
@@ -80,7 +90,9 @@ async def test_get_transcript_fallback_language(
     video_id = "LPZh9BOjkQs"
 
     title = fetch_title(video_id, "en")
-    expect = f"# {title}\n" + "\n".join((item.text for item in YouTubeTranscriptApi().fetch(video_id)))
+    expect = Transcript(
+        title=title, transcript="\n".join((item.text for item in YouTubeTranscriptApi().fetch(video_id)))
+    )
 
     res = await mcp_client_session.call_tool(
         "get_transcript",
@@ -90,7 +102,9 @@ async def test_get_transcript_fallback_language(
         },
     )
     assert isinstance(res.content[0], TextContent)
-    assert res.content[0].text == expect
+
+    transcript = Transcript.model_validate_json(res.content[0].text)
+    assert transcript == expect
     assert not res.isError
 
 
@@ -115,12 +129,16 @@ async def test_get_transcript_with_short_url(mcp_client_session: ClientSession) 
     video_id = "LPZh9BOjkQs"
 
     title = fetch_title(video_id, "en")
-    expect = f"# {title}\n" + "\n".join((item.text for item in YouTubeTranscriptApi().fetch(video_id)))
+    expect = Transcript(
+        title=title, transcript="\n".join((item.text for item in YouTubeTranscriptApi().fetch(video_id)))
+    )
 
     res = await mcp_client_session.call_tool(
         "get_transcript",
         arguments={"url": f"https://youtu.be/{video_id}"},
     )
     assert isinstance(res.content[0], TextContent)
-    assert res.content[0].text == expect
+
+    transcript = Transcript.model_validate_json(res.content[0].text)
+    assert transcript == expect
     assert not res.isError
