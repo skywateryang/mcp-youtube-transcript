@@ -41,6 +41,8 @@ async def test_list_tools(mcp_client_session: ClientSession) -> None:
 
 
 @pytest.mark.skipif(os.getenv("CI") == "true", reason="Skipping this test on CI")
+@pytest.mark.default_cassette("LPZh9BOjkQs.yaml")
+@pytest.mark.vcr
 @pytest.mark.anyio
 async def test_get_transcript(mcp_client_session: ClientSession) -> None:
     video_id = "LPZh9BOjkQs"
@@ -52,7 +54,7 @@ async def test_get_transcript(mcp_client_session: ClientSession) -> None:
 
     res = await mcp_client_session.call_tool(
         "get_transcript",
-        arguments={"url": f"https//www.youtube.com/watch?v={video_id}"},
+        arguments={"url": f"https://www.youtube.com/watch?v={video_id}"},
     )
     assert isinstance(res.content[0], TextContent)
 
@@ -62,6 +64,8 @@ async def test_get_transcript(mcp_client_session: ClientSession) -> None:
 
 
 @pytest.mark.skipif(os.getenv("CI") == "true", reason="Skipping this test on CI")
+@pytest.mark.default_cassette("WjAXZkQSE2U.yaml")
+@pytest.mark.vcr
 @pytest.mark.anyio
 async def test_get_transcript_with_language(mcp_client_session: ClientSession) -> None:
     video_id = "WjAXZkQSE2U"
@@ -73,7 +77,7 @@ async def test_get_transcript_with_language(mcp_client_session: ClientSession) -
 
     res = await mcp_client_session.call_tool(
         "get_transcript",
-        arguments={"url": f"https//www.youtube.com/watch?v={video_id}", "lang": "ja"},
+        arguments={"url": f"https://www.youtube.com/watch?v={video_id}", "lang": "ja"},
     )
     assert isinstance(res.content[0], TextContent)
 
@@ -83,6 +87,8 @@ async def test_get_transcript_with_language(mcp_client_session: ClientSession) -
 
 
 @pytest.mark.skipif(os.getenv("CI") == "true", reason="Skipping this test on CI")
+@pytest.mark.default_cassette("LPZh9BOjkQs.yaml")
+@pytest.mark.vcr
 @pytest.mark.anyio
 async def test_get_transcript_fallback_language(
     mcp_client_session: ClientSession,
@@ -97,7 +103,7 @@ async def test_get_transcript_fallback_language(
     res = await mcp_client_session.call_tool(
         "get_transcript",
         arguments={
-            "url": f"https//www.youtube.com/watch?v={video_id}",
+            "url": f"https://www.youtube.com/watch?v={video_id}",
             "lang": "unknown",
         },
     )
@@ -111,19 +117,23 @@ async def test_get_transcript_fallback_language(
 @pytest.mark.anyio
 async def test_get_transcript_invalid_url(mcp_client_session: ClientSession) -> None:
     res = await mcp_client_session.call_tool(
-        "get_transcript", arguments={"url": "https//www.youtube.com/watch?vv=abcdefg"}
+        "get_transcript", arguments={"url": "https://www.youtube.com/watch?vv=abcdefg"}
     )
     assert res.isError
 
 
 @pytest.mark.skipif(os.getenv("CI") == "true", reason="Skipping this test on CI")
+@pytest.mark.default_cassette("error.yaml")
+@pytest.mark.vcr
 @pytest.mark.anyio
 async def test_get_transcript_not_found(mcp_client_session: ClientSession) -> None:
-    res = await mcp_client_session.call_tool("get_transcript", arguments={"url": "https//www.youtube.com/watch?v=a"})
+    res = await mcp_client_session.call_tool("get_transcript", arguments={"url": "https://www.youtube.com/watch?v=a"})
     assert res.isError
 
 
 @pytest.mark.skipif(os.getenv("CI") == "true", reason="Skipping this test on CI")
+@pytest.mark.default_cassette("LPZh9BOjkQs.yaml")
+@pytest.mark.vcr
 @pytest.mark.anyio
 async def test_get_transcript_with_short_url(mcp_client_session: ClientSession) -> None:
     video_id = "LPZh9BOjkQs"
