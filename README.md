@@ -52,6 +52,12 @@ For more information,
 see: [For Claude Desktop Users - Model Context Protocol](https://modelcontextprotocol.io/quickstart/user).
 
 ### Installing via Smithery
+> [!NOTE]
+> When using this method, you will be utilizing servers hosted by Smithery.
+> Requests and responses will be routed through their servers.
+> Please refer to the [Smithery Privacy Notice](https://smithery.ai/privacy) for information
+> about their data handling practices.
+
 The [Smithery CLI](https://github.com/smithery-ai/cli) enables the installation of MCP servers on various clients.
 
 For instance, to install this server for Claude Desktop, execute the following command:
