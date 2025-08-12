@@ -19,6 +19,7 @@ Fetches the transcript of a specified YouTube video.
 #### Parameters
 - **url** *(string)*: The full URL of the YouTube video. This field is required.
 - **lang** *(string, optional)*: The desired language for the transcript. Defaults to `en` if not specified.
+- **next_cursor** *(string, optional)*: Cursor to retrieve the next page of the transcript.
 
 ## Installation
 > [!NOTE]
@@ -67,6 +68,30 @@ npx -y @smithery/cli list clients
 
 Refer to the [Smithery CLI documentation](https://github.com/smithery-ai/cli) for additional details.
 
+## Response Pagination
+When retrieving transcripts for longer videos, the content may exceed the token size limits of the LLM.
+To avoid this issue, this server splits transcripts that exceed 50,000 characters.
+If a transcript is split, the response will include a `next_cursor`.
+To retrieve the next part, include this `next_cursor`　value in your request.
+
+The token size limits vary depending on the LLM and language you are using. If you need to split responses into smaller chunks, you can adjust this using the `--response-limit`　command line argument. For example, the configuration below splits responses to contain no more than 15,000 characters each:
+
+```json
+{
+  "mcpServers": {
+    "youtube-transcript": {
+      "command": "uvx",
+      "args": [
+        "--from",
+        "git+https://github.com/jkawamoto/mcp-youtube-transcript",
+        "mcp-youtube-transcript",
+        "--response-limit",
+        "15000"
+      ]
+    }
+  }
+}
+```
 
 ## Using Proxy Servers
 In environments where access to YouTube is restricted, you can use proxy servers.
