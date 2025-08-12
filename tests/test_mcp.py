@@ -17,8 +17,6 @@ from youtube_transcript_api import YouTubeTranscriptApi
 
 from mcp_youtube_transcript import Transcript
 
-params = StdioServerParameters(command="uv", args=["run", "mcp-youtube-transcript"])
-
 
 def fetch_title(url: str, lang: str) -> str:
     res = requests.get(f"https://www.youtube.com/watch?v={url}", headers={"Accept-Language": lang})
@@ -28,6 +26,7 @@ def fetch_title(url: str, lang: str) -> str:
 
 @pytest.fixture(scope="module")
 async def mcp_client_session() -> AsyncGenerator[ClientSession, None]:
+    params = StdioServerParameters(command="uv", args=["run", "mcp-youtube-transcript", "--response-limit", "-1"])
     async with stdio_client(params) as streams:
         async with ClientSession(streams[0], streams[1]) as session:
             await session.initialize()
@@ -49,7 +48,8 @@ async def test_get_transcript(mcp_client_session: ClientSession) -> None:
 
     title = fetch_title(video_id, "en")
     expect = Transcript(
-        title=title, transcript="\n".join((item.text for item in YouTubeTranscriptApi().fetch(video_id)))
+        title=title,
+        transcript="\n".join((item.text for item in YouTubeTranscriptApi().fetch(video_id))),
     )
 
     res = await mcp_client_session.call_tool(
@@ -72,7 +72,8 @@ async def test_get_transcript_with_language(mcp_client_session: ClientSession) -
 
     title = fetch_title(video_id, "ja")
     expect = Transcript(
-        title=title, transcript="\n".join((item.text for item in YouTubeTranscriptApi().fetch(video_id, ["ja"])))
+        title=title,
+        transcript="\n".join((item.text for item in YouTubeTranscriptApi().fetch(video_id, ["ja"]))),
     )
 
     res = await mcp_client_session.call_tool(
@@ -97,7 +98,8 @@ async def test_get_transcript_fallback_language(
 
     title = fetch_title(video_id, "en")
     expect = Transcript(
-        title=title, transcript="\n".join((item.text for item in YouTubeTranscriptApi().fetch(video_id)))
+        title=title,
+        transcript="\n".join((item.text for item in YouTubeTranscriptApi().fetch(video_id))),
     )
 
     res = await mcp_client_session.call_tool(
@@ -140,7 +142,8 @@ async def test_get_transcript_with_short_url(mcp_client_session: ClientSession) 
 
     title = fetch_title(video_id, "en")
     expect = Transcript(
-        title=title, transcript="\n".join((item.text for item in YouTubeTranscriptApi().fetch(video_id)))
+        title=title,
+        transcript="\n".join((item.text for item in YouTubeTranscriptApi().fetch(video_id))),
     )
 
     res = await mcp_client_session.call_tool(
@@ -152,3 +155,44 @@ async def test_get_transcript_with_short_url(mcp_client_session: ClientSession) 
     transcript = Transcript.model_validate_json(res.content[0].text)
     assert transcript == expect
     assert not res.isError
+
+
+@pytest.fixture(scope="module")
+async def mcp_client_session_with_response_limit() -> AsyncGenerator[ClientSession, None]:
+    params = StdioServerParameters(command="uv", args=["run", "mcp-youtube-transcript", "--response-limit", "3000"])
+    async with stdio_client(params) as streams:
+        async with ClientSession(streams[0], streams[1]) as session:
+            await session.initialize()
+            yield session
+
+
+@pytest.mark.skipif(os.getenv("CI") == "true", reason="Skipping this test on CI")
+@pytest.mark.default_cassette("LPZh9BOjkQs.yaml")
+@pytest.mark.vcr
+@pytest.mark.anyio
+async def test_get_transcript_with_response_limit(mcp_client_session_with_response_limit: ClientSession) -> None:
+    video_id = "LPZh9BOjkQs"
+
+    expect = Transcript(
+        title=fetch_title(video_id, "en"),
+        transcript="\n".join((item.text for item in YouTubeTranscriptApi().fetch(video_id))),
+    )
+
+    transcript = ""
+    cursor = None
+    while True:
+        res = await mcp_client_session_with_response_limit.call_tool(
+            "get_transcript",
+            arguments={"url": f"https://www.youtube.com/watch?v={video_id}", "next_cursor": cursor},
+        )
+        assert not res.isError
+        assert isinstance(res.content[0], TextContent)
+
+        t = Transcript.model_validate_json(res.content[0].text)
+        transcript += t.transcript + "\n"
+        if t.next_cursor is None:
+            break
+        cursor = t.next_cursor
+
+    assert t.title == expect.title
+    assert transcript[:-1] == expect.transcript

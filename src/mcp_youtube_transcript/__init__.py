@@ -8,6 +8,7 @@
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from functools import lru_cache, partial
+from itertools import islice
 from typing import AsyncIterator, Tuple
 from typing import Final
 from urllib.parse import urlparse, parse_qs
@@ -35,7 +36,7 @@ async def _app_lifespan(_server: FastMCP, proxy_config: ProxyConfig | None) -> A
 
 
 @lru_cache
-def _get_transcript(ctx: AppContext, video_id: str, lang: str) -> Tuple[str, str]:
+def _get_transcript(ctx: AppContext, video_id: str, lang: str) -> Tuple[str, list[str]]:
     if lang == "en":
         languages = ["en"]
     else:
@@ -49,7 +50,7 @@ def _get_transcript(ctx: AppContext, video_id: str, lang: str) -> Tuple[str, str
     title = soup.title.string if soup.title and soup.title.string else "Transcript"
 
     transcripts = ctx.ytt_api.fetch(video_id, languages=languages)
-    return title, "\n".join((item.text for item in transcripts))
+    return title, [item.text for item in transcripts]
 
 
 class Transcript(BaseModel):
@@ -57,9 +58,11 @@ class Transcript(BaseModel):
 
     title: str = Field(description="Title of the video")
     transcript: str = Field(description="Transcript of the video")
+    next_cursor: str | None = Field(description="Cursor to retrieve the next page of the transcript", default=None)
 
 
 def server(
+    response_limit: int | None = None,
     webshare_proxy_username: str | None = None,
     webshare_proxy_password: str | None = None,
     http_proxy: str | None = None,
@@ -80,6 +83,7 @@ def server(
         ctx: Context,
         url: str = Field(description="The URL of the YouTube video"),
         lang: str = Field(description="The preferred language for the transcript", default="en"),
+        next_cursor: str | None = Field(description="Cursor to retrieve the next page of the transcript", default=None),
     ) -> Transcript:
         """Retrieves the transcript of a YouTube video."""
         parsed_url = urlparse(url)
@@ -92,8 +96,20 @@ def server(
             video_id = q[0]
 
         app_ctx: AppContext = ctx.request_context.lifespan_context  # type: ignore
-        title, transcript = _get_transcript(app_ctx, video_id, lang)
-        return Transcript(title=title, transcript=transcript)
+        title, transcripts = _get_transcript(app_ctx, video_id, lang)
+
+        if response_limit is None or response_limit <= 0:
+            return Transcript(title=title, transcript="\n".join(transcripts))
+
+        res = ""
+        cursor = None
+        for i, line in islice(enumerate(transcripts), int(next_cursor or 0), None):
+            if len(res) + len(line) + 1 > response_limit:
+                cursor = str(i)
+                break
+            res += f"{line}\n"
+
+        return Transcript(title=title, transcript=res[:-1], next_cursor=cursor)
 
     return mcp
 
