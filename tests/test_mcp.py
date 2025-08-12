@@ -46,9 +46,8 @@ async def test_list_tools(mcp_client_session: ClientSession) -> None:
 async def test_get_transcript(mcp_client_session: ClientSession) -> None:
     video_id = "LPZh9BOjkQs"
 
-    title = fetch_title(video_id, "en")
     expect = Transcript(
-        title=title,
+        title=fetch_title(video_id, "en"),
         transcript="\n".join((item.text for item in YouTubeTranscriptApi().fetch(video_id))),
     )
 
@@ -70,9 +69,8 @@ async def test_get_transcript(mcp_client_session: ClientSession) -> None:
 async def test_get_transcript_with_language(mcp_client_session: ClientSession) -> None:
     video_id = "WjAXZkQSE2U"
 
-    title = fetch_title(video_id, "ja")
     expect = Transcript(
-        title=title,
+        title=fetch_title(video_id, "ja"),
         transcript="\n".join((item.text for item in YouTubeTranscriptApi().fetch(video_id, ["ja"]))),
     )
 
@@ -96,9 +94,8 @@ async def test_get_transcript_fallback_language(
 ) -> None:
     video_id = "LPZh9BOjkQs"
 
-    title = fetch_title(video_id, "en")
     expect = Transcript(
-        title=title,
+        title=fetch_title(video_id, "en"),
         transcript="\n".join((item.text for item in YouTubeTranscriptApi().fetch(video_id))),
     )
 
@@ -140,9 +137,8 @@ async def test_get_transcript_not_found(mcp_client_session: ClientSession) -> No
 async def test_get_transcript_with_short_url(mcp_client_session: ClientSession) -> None:
     video_id = "LPZh9BOjkQs"
 
-    title = fetch_title(video_id, "en")
     expect = Transcript(
-        title=title,
+        title=fetch_title(video_id, "en"),
         transcript="\n".join((item.text for item in YouTubeTranscriptApi().fetch(video_id))),
     )
 
