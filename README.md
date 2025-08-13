@@ -51,6 +51,12 @@ After editing, restart the application.
 For more information,
 see: [For Claude Desktop Users - Model Context Protocol](https://modelcontextprotocol.io/quickstart/user).
 
+### For LM Studio
+To configure this server for LM Studio, click the button below.
+
+[![Add MCP Server youtube-transcript to LM Studio](https://files.lmstudio.ai/deeplink/mcp-install-light.svg)](https://lmstudio.ai/install-mcp?name=youtube-transcript&config=eyJjb21tYW5kIjoidXZ4IiwiYXJncyI6WyItLWZyb20iLCJnaXQraHR0cHM6Ly9naXRodWIuY29tL2prYXdhbW90by9tY3AteW91dHViZS10cmFuc2NyaXB0IiwibWNwLXlvdXR1YmUtdHJhbnNjcmlwdCJdfQ%3D%3D)
+
+
 ### Installing via Smithery
 > [!NOTE]
 > When using this method, you will be utilizing servers hosted by Smithery.
@@ -78,9 +84,12 @@ Refer to the [Smithery CLI documentation](https://github.com/smithery-ai/cli) fo
 When retrieving transcripts for longer videos, the content may exceed the token size limits of the LLM.
 To avoid this issue, this server splits transcripts that exceed 50,000 characters.
 If a transcript is split, the response will include a `next_cursor`.
-To retrieve the next part, include this `next_cursor`　value in your request.
+To retrieve the next part, include this `next_cursor` value in your request.
 
-The token size limits vary depending on the LLM and language you are using. If you need to split responses into smaller chunks, you can adjust this using the `--response-limit`　command line argument. For example, the configuration below splits responses to contain no more than 15,000 characters each:
+The token size limits vary depending on the LLM and language you are using.
+If you need to split responses into smaller chunks,
+you can adjust this using the `--response-limit` command line argument.
+For example, the configuration below splits responses to contain no more than 15,000 characters each:
 
 ```json
 {
