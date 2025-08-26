@@ -29,6 +29,7 @@ dependencies = [
     "requests>=2.32.3",
     "rich-click>=1.8.8",
     "youtube-transcript-api>=1.1",
+    "yt-dlp>=2025.8.22",
 ]
 
 scripts.mcp-youtube-transcript = "mcp_youtube_transcript.cli:main"
@@ -68,3 +69,9 @@ replace = 'version = "{new_version}"'
 warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = true
+
+[[tool.mypy.overrides]]
+module = [
+    "yt_dlp.*",
+]
+ignore_missing_imports = true

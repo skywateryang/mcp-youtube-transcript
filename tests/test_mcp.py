@@ -14,8 +14,10 @@ from bs4 import BeautifulSoup
 from mcp import StdioServerParameters, stdio_client, ClientSession
 from mcp.types import TextContent
 from youtube_transcript_api import YouTubeTranscriptApi
+import yt_dlp
+from yt_dlp.extractor.youtube import YoutubeIE
 
-from mcp_youtube_transcript import Transcript
+from mcp_youtube_transcript import Transcript, VideoInfo
 
 
 def fetch_title(url: str, lang: str) -> str:
@@ -192,3 +194,26 @@ async def test_get_transcript_with_response_limit(mcp_client_session_with_respon
 
     assert t.title == expect.title
     assert transcript[:-1] == expect.transcript
+
+
+@pytest.mark.skipif(os.getenv("CI") == "true", reason="Skipping this test on CI")
+@pytest.mark.anyio
+async def test_get_video_info(mcp_client_session: ClientSession) -> None:
+    video_id = "LPZh9BOjkQs"
+
+    dlp = yt_dlp.YoutubeDL(params={"quiet": True}, auto_init=False)
+    dlp.add_info_extractor(YoutubeIE())
+    dlp_res = dlp.extract_info(f"https://www.youtube.com/watch?v={video_id}", download=False)
+    expect = VideoInfo(title=dlp_res["title"], description=dlp_res["description"], uploader=dlp_res["uploader"])
+
+    res = await mcp_client_session.call_tool(
+        "get_video_info",
+        arguments={
+            "url": f"https://www.youtube.com/watch?v={video_id}",
+        },
+    )
+    assert isinstance(res.content[0], TextContent)
+
+    info = VideoInfo.model_validate_json(res.content[0].text)
+    assert info == expect
+    assert not res.isError

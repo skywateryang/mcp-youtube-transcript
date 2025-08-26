@@ -21,19 +21,39 @@ from mcp.server.fastmcp import Context
 from pydantic import Field, BaseModel
 from youtube_transcript_api import YouTubeTranscriptApi
 from youtube_transcript_api.proxies import WebshareProxyConfig, GenericProxyConfig, ProxyConfig
+from yt_dlp import YoutubeDL
+from yt_dlp.extractor.youtube import YoutubeIE
 
 
 @dataclass(frozen=True)
 class AppContext:
     http_client: requests.Session
     ytt_api: YouTubeTranscriptApi
+    dlp: YoutubeDL
 
 
 @asynccontextmanager
 async def _app_lifespan(_server: FastMCP, proxy_config: ProxyConfig | None) -> AsyncIterator[AppContext]:
-    with requests.Session() as http_client:
+    with requests.Session() as http_client, YoutubeDL(params={"quiet": True}, auto_init=False) as dlp:
         ytt_api = YouTubeTranscriptApi(http_client=http_client, proxy_config=proxy_config)
-        yield AppContext(http_client=http_client, ytt_api=ytt_api)
+        dlp.add_info_extractor(YoutubeIE())
+        yield AppContext(http_client=http_client, ytt_api=ytt_api, dlp=dlp)
+
+
+class Transcript(BaseModel):
+    """Transcript of a YouTube video."""
+
+    title: str = Field(description="Title of the video")
+    transcript: str = Field(description="Transcript of the video")
+    next_cursor: str | None = Field(description="Cursor to retrieve the next page of the transcript", default=None)
+
+
+class VideoInfo(BaseModel):
+    """Video information."""
+
+    title: str = Field(description="Title of the video")
+    description: str = Field(description="Description of the video")
+    uploader: str = Field(description="Uploader of the video")
 
 
 @lru_cache
@@ -54,12 +74,10 @@ def _get_transcript(ctx: AppContext, video_id: str, lang: str) -> Tuple[str, lis
     return title, [item.text for item in transcripts]
 
 
-class Transcript(BaseModel):
-    """Transcript of a YouTube video."""
-
-    title: str = Field(description="Title of the video")
-    transcript: str = Field(description="Transcript of the video")
-    next_cursor: str | None = Field(description="Cursor to retrieve the next page of the transcript", default=None)
+@lru_cache
+def _get_video_info(ctx: AppContext, video_url: str) -> VideoInfo:
+    res = ctx.dlp.extract_info(video_url, download=False)
+    return VideoInfo(title=res["title"], description=res["description"], uploader=res["uploader"])
 
 
 def server(
@@ -111,7 +129,15 @@ def server(
 
         return Transcript(title=title, transcript=res[:-1], next_cursor=cursor)
 
+    @mcp.tool()
+    def get_video_info(
+        ctx: Context[ServerSession, AppContext],
+        url: str = Field(description="The URL of the YouTube video"),
+    ) -> VideoInfo:
+        """Retrieves the video information."""
+        return _get_video_info(ctx.request_context.lifespan_context, url)
+
     return mcp
 
 
-__all__: Final = ["server", "Transcript"]
+__all__: Final = ["server", "Transcript", "VideoInfo"]
