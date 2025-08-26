@@ -1,5 +1,5 @@
 version = 1
-revision = 2
+revision = 3
 requires-python = ">=3.10"
 resolution-markers = [
     "platform_python_implementation != 'PyPy'",
@@ -369,6 +369,7 @@ dependencies = [
     { name = "requests" },
     { name = "rich-click" },
     { name = "youtube-transcript-api" },
+    { name = "yt-dlp" },
 ]
 
 [package.dev-dependencies]
@@ -391,6 +392,7 @@ requires-dist = [
     { name = "requests", specifier = ">=2.32.3" },
     { name = "rich-click", specifier = ">=1.8.8" },
     { name = "youtube-transcript-api", specifier = ">=1.1" },
+    { name = "yt-dlp", specifier = ">=2025.8.22" },
 ]
 
 [package.metadata.requires-dev]
@@ -1554,4 +1556,13 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/8f/f8/5e12d3d0c7001c3b3078697b9918241022bdb1ae12715e9debb00a83e16e/youtube_transcript_api-1.2.2.tar.gz", hash = "sha256:5f67cfaff3621d969778817a3d7b2172c16784855f45fcaed4f0529632e2fef4", size = 469634, upload-time = "2025-08-04T12:22:52.158Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/41/92/3d1a580f0efcad926f45876cf6cb92b2c260e84ae75dae5463bbf38f92e7/youtube_transcript_api-1.2.2-py3-none-any.whl", hash = "sha256:feca8c7f7c9d65188ef6377fc0e01cf466e6b68f1b3e648019646ab342f994d2", size = 485047, upload-time = "2025-08-04T12:22:50.836Z" },
+]
+
+[[package]]
+name = "yt-dlp"
+version = "2025.8.22"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/40/98/b077bebdc5c759a3f7af3ed3a2a5345ad1145c61963b476469b840ac84ce/yt_dlp-2025.8.22.tar.gz", hash = "sha256:d1846bbb7edbcd2a0d4a2d76c7a2124868de9ea3b3959a8cb8219e3f7cb5c335", size = 3037631, upload-time = "2025-08-23T00:07:02.939Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/f4/06/e9e5e85969bd85142b004577915f33356ee0d5e20b79af8dd40b8bbfc96f/yt_dlp-2025.8.22-py3-none-any.whl", hash = "sha256:b8c71fe4516170dea60c6e5c54e2d45654693b8dc273cad060f22199476ec979", size = 3266783, upload-time = "2025-08-23T00:07:00.176Z" },
 ]
