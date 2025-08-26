@@ -21,6 +21,12 @@ Fetches the transcript of a specified YouTube video.
 - **lang** *(string, optional)*: The desired language for the transcript. Defaults to `en` if not specified.
 - **next_cursor** *(string, optional)*: Cursor to retrieve the next page of the transcript.
 
+### `get_video_info`
+Fetches the metadata of a specified YouTube video.
+
+#### Parameters
+- **url** *(string)*: The full URL of the YouTube video. This field is required.
+
 ## Installation
 > [!NOTE]
 > You'll need [`uv`](https://docs.astral.sh/uv) installed on your system to use `uvx` command.
