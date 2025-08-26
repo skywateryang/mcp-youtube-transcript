@@ -39,6 +39,7 @@ async def mcp_client_session() -> AsyncGenerator[ClientSession, None]:
 async def test_list_tools(mcp_client_session: ClientSession) -> None:
     res = await mcp_client_session.list_tools()
     assert any(tool.name == "get_transcript" for tool in res.tools)
+    assert any(tool.name == "get_video_info" for tool in res.tools)
 
 
 @pytest.mark.skipif(os.getenv("CI") == "true", reason="Skipping this test on CI")
