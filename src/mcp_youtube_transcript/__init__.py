@@ -7,12 +7,14 @@
 #  http://opensource.org/licenses/mit-license.php
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
+from datetime import datetime, timedelta
 from functools import lru_cache, partial
 from itertools import islice
 from typing import AsyncIterator, Tuple
 from typing import Final
 from urllib.parse import urlparse, parse_qs
 
+import humanize
 import requests
 from bs4 import BeautifulSoup
 from mcp import ServerSession
@@ -54,6 +56,16 @@ class VideoInfo(BaseModel):
     title: str = Field(description="Title of the video")
     description: str = Field(description="Description of the video")
     uploader: str = Field(description="Uploader of the video")
+    upload_date: datetime = Field(description="Upload date of the video")
+    duration: str = Field(description="Duration of the video")
+
+
+def _parse_time_info(date: int, timestamp: int, duration: int) -> Tuple[datetime, str]:
+    parsed_date = datetime.strptime(str(date), "%Y%m%d").date()
+    parsed_time = datetime.strptime(str(timestamp), "%H%M%S%f").time()
+    upload_date = datetime.combine(parsed_date, parsed_time)
+    duration_str = humanize.naturaldelta(timedelta(seconds=duration))
+    return upload_date, duration_str
 
 
 @lru_cache
@@ -77,7 +89,14 @@ def _get_transcript(ctx: AppContext, video_id: str, lang: str) -> Tuple[str, lis
 @lru_cache
 def _get_video_info(ctx: AppContext, video_url: str) -> VideoInfo:
     res = ctx.dlp.extract_info(video_url, download=False)
-    return VideoInfo(title=res["title"], description=res["description"], uploader=res["uploader"])
+    upload_date, duration = _parse_time_info(res["upload_date"], res["timestamp"], res["duration"])
+    return VideoInfo(
+        title=res["title"],
+        description=res["description"],
+        uploader=res["uploader"],
+        upload_date=upload_date,
+        duration=duration,
+    )
 
 
 def server(

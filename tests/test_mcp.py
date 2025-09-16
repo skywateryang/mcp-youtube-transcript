@@ -5,9 +5,11 @@
 #  This software is released under the MIT License.
 #
 #  http://opensource.org/licenses/mit-license.php
+from datetime import datetime, timedelta
 import os
 from typing import AsyncGenerator
 
+import humanize
 import pytest
 import requests
 from bs4 import BeautifulSoup
@@ -17,7 +19,7 @@ from youtube_transcript_api import YouTubeTranscriptApi
 import yt_dlp
 from yt_dlp.extractor.youtube import YoutubeIE
 
-from mcp_youtube_transcript import Transcript, VideoInfo
+from mcp_youtube_transcript import Transcript, VideoInfo, _parse_time_info
 
 
 def fetch_title(url: str, lang: str) -> str:
@@ -205,7 +207,14 @@ async def test_get_video_info(mcp_client_session: ClientSession) -> None:
     dlp = yt_dlp.YoutubeDL(params={"quiet": True}, auto_init=False)
     dlp.add_info_extractor(YoutubeIE())
     dlp_res = dlp.extract_info(f"https://www.youtube.com/watch?v={video_id}", download=False)
-    expect = VideoInfo(title=dlp_res["title"], description=dlp_res["description"], uploader=dlp_res["uploader"])
+    upload_date, duration = _parse_time_info(dlp_res["upload_date"], dlp_res["timestamp"], dlp_res["duration"])
+    expect = VideoInfo(
+        title=dlp_res["title"],
+        description=dlp_res["description"],
+        uploader=dlp_res["uploader"],
+        upload_date=upload_date,
+        duration=duration,
+    )
 
     res = await mcp_client_session.call_tool(
         "get_video_info",
@@ -218,3 +227,9 @@ async def test_get_video_info(mcp_client_session: ClientSession) -> None:
     info = VideoInfo.model_validate_json(res.content[0].text)
     assert info == expect
     assert not res.isError
+
+
+def test_parse_time_info() -> None:
+    upload_date, duration = _parse_time_info(20250921, 1650496000, 1234567)
+    assert upload_date == datetime(2025, 9, 21, 16, 50, 49, 600000)
+    assert duration == humanize.naturaldelta(timedelta(seconds=1234567))
