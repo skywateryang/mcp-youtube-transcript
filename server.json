@@ -7,13 +7,13 @@
     "url": "https://github.com/jkawamoto/mcp-youtube-transcript",
     "source": "github"
   },
-  "version": "0.5.0",
+  "version": "0.5.1",
   "packages": [
     {
       "registry_type": "mcpb",
-      "identifier": "https://github.com/jkawamoto/mcp-youtube-transcript/releases/download/v0.5.0/mcp-youtube-transcript.mcpb",
-      "file_sha256": "d44842be1e8029c9eaa4412668d06825d668b4eeb645a70386b1c98ab9de49ec",
-      "version": "0.5.0",
+      "identifier": "https://github.com/jkawamoto/mcp-youtube-transcript/releases/download/v0.5.1/mcp-youtube-transcript.mcpb",
+      "file_sha256": "3356e741d4dafa24b0e931e3afd773c64d503f6624338beec62885f0dde59695",
+      "version": "0.5.1",
       "transport": {
         "type": "stdio"
       }

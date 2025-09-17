@@ -2,7 +2,7 @@
   "dxt_version": "0.1",
   "name": "mcp-youtube-transcript",
   "display_name": "YouTube Transcript MCP Server",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "MCP server retrieving transcripts of YouTube videos",
   "author": {
     "name": "Junpei Kawamoto",
