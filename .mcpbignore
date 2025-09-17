@@ -1,3 +1,6 @@
 .*
 tests/
 __pycache__/
+Dockerfile
+server.json
+smithery.yaml
