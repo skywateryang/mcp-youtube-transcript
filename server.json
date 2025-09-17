@@ -1,0 +1,22 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-07-09/server.schema.json",
+  "name": "io.github.jkawamoto/mcp-youtube-transcript",
+  "description": "An MCP server retrieving transcripts of YouTube videos",
+  "status": "active",
+  "repository": {
+    "url": "https://github.com/jkawamoto/mcp-youtube-transcript",
+    "source": "github"
+  },
+  "version": "0.5.0",
+  "packages": [
+    {
+      "registry_type": "mcpb",
+      "identifier": "https://github.com/jkawamoto/mcp-youtube-transcript/releases/download/v0.5.0/mcp-youtube-transcript.mcpb",
+      "file_sha256": "d44842be1e8029c9eaa4412668d06825d668b4eeb645a70386b1c98ab9de49ec",
+      "version": "0.5.0",
+      "transport": {
+        "type": "stdio"
+      }
+    }
+  ]
+}
