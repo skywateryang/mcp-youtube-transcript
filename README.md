@@ -36,7 +36,13 @@ Please refer to this tutorial for detailed installation instructions:
 [YouTube Transcript Extension](https://block.github.io/goose/docs/mcp/youtube-transcript-mcp).
 
 ### For Claude Desktop
-To configure this server for Claude Desktop, edit the `claude_desktop_config.json` file with the following entry under
+
+Download the latest MCP bundle `mcp-youtube-transcript.mcpb` from
+the [Releases](https://github.com/jkawamoto/mcp-youtube-transcript/releases) page,
+then open the downloaded `.mcpb `file or drag it into the Claude Desktop's Settings window.
+
+You can also manually configure this server for Claude Desktop.
+Edit the `claude_desktop_config.json` file by adding the following entry under
 `mcpServers`:
 
 ```json
@@ -62,10 +68,14 @@ To configure this server for LM Studio, click the button below.
 
 [![Add MCP Server youtube-transcript to LM Studio](https://files.lmstudio.ai/deeplink/mcp-install-light.svg)](https://lmstudio.ai/install-mcp?name=youtube-transcript&config=eyJjb21tYW5kIjoidXZ4IiwiYXJncyI6WyItLWZyb20iLCJnaXQraHR0cHM6Ly9naXRodWIuY29tL2prYXdhbW90by9tY3AteW91dHViZS10cmFuc2NyaXB0IiwibWNwLXlvdXR1YmUtdHJhbnNjcmlwdCJdfQ%3D%3D)
 
+### Using Docker
+
+A Docker image for this server is available on [Docker Hub](https://hub.docker.com/mcp/server/youtube_transcript/).
+Please refer to the Docker Hub page for detailed usage instructions and documentation.
 
 ### Installing via Smithery
 > [!NOTE]
-> When using this method, you will be utilizing servers hosted by Smithery.
+> When using this method, you will be using servers hosted by Smithery.
 > Requests and responses will be routed through their servers.
 > Please refer to the [Smithery Privacy Notice](https://smithery.ai/privacy) for information
 > about their data handling practices.
