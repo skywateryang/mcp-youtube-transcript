@@ -26,6 +26,9 @@ from youtube_transcript_api.proxies import WebshareProxyConfig, GenericProxyConf
 from yt_dlp import YoutubeDL
 from yt_dlp.extractor.youtube import YoutubeIE
 
+# Disable SSL warnings
+import urllib3
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 @dataclass(frozen=True)
 class AppContext:
@@ -37,6 +40,7 @@ class AppContext:
 @asynccontextmanager
 async def _app_lifespan(_server: FastMCP, proxy_config: ProxyConfig | None) -> AsyncIterator[AppContext]:
     with requests.Session() as http_client, YoutubeDL(params={"quiet": True}, auto_init=False) as dlp:
+        http_client.verify = False
         ytt_api = YouTubeTranscriptApi(http_client=http_client, proxy_config=proxy_config)
         dlp.add_info_extractor(YoutubeIE())
         yield AppContext(http_client=http_client, ytt_api=ytt_api, dlp=dlp)
